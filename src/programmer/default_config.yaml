@@ -80,25 +80,28 @@ lights:
   # Note that lights can pull a max of 0.5A @ 6V, which is not much.
   enabled: true
   # Light mode. Allowed values: default, always_on, brake_light
-  mode: default
+  # mode: default
 
 pedal_assist_levels:
   standard:
     levels:
       - flags: ASSIST_FLAG_NONE
         max_cadence_percent: 100
-        max_speed_percent: 0
-        max_throttle_current_percent: 0
+        max_pas_speed: 0km/h
         target_power_watts: 0
+        max_throttle_speed: 0km/h
+        max_throttle_power_watts: 0
       - flags: ASSIST_FLAG_NONE
         max_cadence_percent: 100
-        max_speed_percent: 0
-        max_throttle_current_percent: 0
+        max_pas_speed: 0km/h
         target_power_watts: 0
+        max_throttle_speed: 0km/h
+        max_throttle_power_watts: 0
   sport:
     levels:
       - flags: ASSIST_FLAG_NONE
         max_cadence_percent: 100
-        max_speed_percent: 0
-        max_throttle_current_percent: 0
+        max_pas_speed: 0km/h
         target_power_watts: 0
+        max_throttle_speed: 0km/h
+        max_throttle_power_watts: 0
