@@ -6,7 +6,7 @@ from validation import Config, PedalAssistLevels
 from write_header import HeaderFile
 
 
-def parse_yaml(file_path):
+def parse_yaml(file_path: str):
     with open(file_path, "r") as file:
         return parse_yaml_raw_as(Config, file)
 
@@ -22,18 +22,19 @@ def write_pas_levels(pas_levels: PedalAssistLevels, header_file: HeaderFile):
                 )
 
 
-def write_general(config: BaseModel, header_file: HeaderFile, prefix_category=""):
+def write_general(
+    config: BaseModel, header_file: HeaderFile, prefix_category: str = ""
+):
     for config_type, config_item in config:
         if isinstance(config_item, PedalAssistLevels):
             write_pas_levels(config_item, header_file)
+        elif isinstance(config_item, BaseModel):
+            write_general(config_item, header_file, f"{prefix_category}{config_type}_")
         else:
-            if isinstance(config_item, BaseModel):
-                write_general(config_item, header_file, f"{config_type}_")
-            else:
-                header_file.write_define(
-                    prefix_category + config_type,
-                    config_item,
-                )
+            header_file.write_define(
+                prefix_category + config_type,
+                config_item,
+            )
 
 
 def main():
