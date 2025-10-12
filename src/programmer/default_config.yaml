@@ -80,7 +80,7 @@ lights:
   # Note that lights can pull a max of 0.5A @ 6V, which is not much.
   enabled: true
   # Light mode. Allowed values: default, always_on, brake_light
-  # mode: default
+  mode: default
 
 pedal_assist_levels:
   standard:

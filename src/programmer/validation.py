@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, BeforeValidator, ConfigDict, Field
 from pydantic_pint import PydanticPintQuantity
 from pint import Quantity, UnitRegistry
 
@@ -11,6 +11,20 @@ ureg = UnitRegistry(autoconvert_offset_to_baseunit=True)
 class BatterySocOffsetPercent(BaseModel):
     empty: int = Field(ge=0, le=100, default=8)
     full: int = Field(ge=0, le=100, default=8)
+
+
+class BatterySocType(Enum):
+    NONE = 0
+    SW102 = 1
+
+
+def validate_battery_soc_type(value: str):
+    try:
+        return BatterySocType[value.upper()]
+    except KeyError:
+        raise ValueError(
+            f"Not a supported battery SOC type, allowed values: {[e.name for e in BatterySocType]}"
+        )
 
 
 class Battery(BaseModel):
@@ -27,7 +41,13 @@ class Battery(BaseModel):
     ]
     low_voltage_ramp_down_percent: int = Field(ge=0, le=100, default=10)
     low_voltage_current_percent: int = Field(ge=0, le=100, default=20)
-    soc_map: Literal["none", "SW102"] = Field(default="none")
+    soc_map: Annotated[
+        BatterySocType,
+        Field(default=BatterySocType.NONE),
+        BeforeValidator(validate_battery_soc_type),
+    ]
+
+    model_config = ConfigDict(use_enum_values=True)
 
 
 class SpeedSensor(BaseModel):
@@ -43,9 +63,27 @@ class ShiftSensor(BaseModel):
     interrupt_current_percent: int = Field(ge=0, le=100, default=10)
 
 
+class TemperatureSensorType(Enum):
+    CONTROLLER = 0
+    MOTOR = 1
+
+
+def validate_temperature_sensor_type(value: str):
+    try:
+        return TemperatureSensorType[value.upper()]
+    except KeyError:
+        raise ValueError(
+            f"Not a supported temperature sensor type, allowed values: {[e.name for e in TemperatureSensorType]}"
+        )
+
+
 class TemperatureSensor(BaseModel):
     enabled: bool = Field(default=True)
-    use_sensor: Literal["controller", "motor"]
+    use_sensor: Annotated[
+        TemperatureSensorType,
+        Field(default=TemperatureSensorType.CONTROLLER),
+        BeforeValidator(validate_temperature_sensor_type),
+    ]
     max_temperature: Annotated[
         Quantity,
         PydanticPintQuantity("degree_Celsius", ureg=ureg),
@@ -57,6 +95,8 @@ class TemperatureSensor(BaseModel):
         Field(default="5 degC"),
     ]
     max_temperature_low_current_percent: int = Field(ge=0, le=100, default=20)
+
+    model_config = ConfigDict(use_enum_values=True)
 
 
 class WalkMode(BaseModel):
@@ -72,14 +112,29 @@ class Pretension(BaseModel):
 
 
 class LightsMode(Enum):
-    default = 0
-    always_on = 1
-    brake_light = 2
+    DEFAULT = 0
+    ALWAYS_ON = 1
+    BRAKE_LIGHT = 2
+
+
+def validate_lights_mode(value: str):
+    try:
+        return LightsMode[value.upper()]
+    except KeyError:
+        raise ValueError(
+            f"Not a supported mode type, allowed values: {[e.name for e in LightsMode]}"
+        )
 
 
 class Lights(BaseModel):
     enabled: bool = Field(default=True)
-    mode: LightsMode = Field(default=LightsMode.default)
+    mode: Annotated[
+        LightsMode,
+        Field(default=LightsMode.DEFAULT),
+        BeforeValidator(validate_lights_mode),
+    ]
+
+    model_config = ConfigDict(use_enum_values=True)
 
 
 class PedalAssistLevel(BaseModel):
@@ -96,7 +151,7 @@ class PedalAssistLevel(BaseModel):
 
 
 class PedalAssistLevelType(BaseModel):
-    levels: list[PedalAssistLevel]
+    levels: list[PedalAssistLevel] = Field(min_length=9, max_length=9)
 
 
 class PedalAssistLevels(BaseModel):
