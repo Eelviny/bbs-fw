@@ -11,12 +11,12 @@
 #define MIN(x, y) (x) < (y) ? (x) : (y)
 #define CLAMP(x, min, max) (MIN(MAX(x, min), max))
 #define MAX_CURRENT_AMPS 25
-#define CURRENT_RAMP_AMPS_S 8
+#define CURRENT_RAMP_PER_SECOND_AMPS 8
 #define CURRENT_RAMP_DOWN_PERCENT_10MS 5
 
 uint32_t system_ms;
 uint8_t target_current = 0;
-uint16_t ramp_up_current_interval_ms = (MAX_CURRENT_AMPS * 10u) / CURRENT_RAMP_AMPS_S;
+uint16_t ramp_up_current_interval_ms = (MAX_CURRENT_AMPS * 10u) / CURRENT_RAMP_PER_SECOND_AMPS;
 
 uint16_t convert_wheel_speed_kph_to_rpm(uint8_t speed_kph)
 {

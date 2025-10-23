@@ -473,7 +473,7 @@ static int16_t process_bafang_display_read_speed()
 			break;
 		}
 
-		if (USE_FREEDOM_UNITS)
+		if (PREFER_IMPERIAL_UNITS)
 		{
 			// Compensate for kph -> mph conversion display will do.
 			data = (data * 161) / 100;
@@ -522,7 +522,7 @@ static int16_t process_bafang_display_read_range()
 
 #if DISPLAY_RANGE_FIELD_DATA == DISPLAY_RANGE_FIELD_TEMPERATURE
 	value = app_get_temperature();
-	#if USE_FREEDOM_UNITS
+	#if PREFER_IMPERIAL_UNITS
 		// Convert to farenheit and compensate for the km -> miles conversion the diplay will do
 		// F_miles = (C * 9/5 + 32) * 161 / 100
 		// Approximistation:
@@ -541,7 +541,7 @@ static int16_t process_bafang_display_read_range()
 		value = MAP32(motor_get_target_current(), 0, 100, 0, max_current_amp_x10);
 	}
 
-	if (USE_FREEDOM_UNITS)
+	if (PREFER_IMPERIAL_UNITS)
 	{
 		// compensate for km -> miles conversion the display will do
 		value = (value * 161u) / 100u;

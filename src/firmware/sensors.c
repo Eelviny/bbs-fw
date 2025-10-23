@@ -244,12 +244,11 @@ uint16_t speed_sensor_get_rpm_x10()
 
 int16_t temperature_contr_x100()
 {
-	const float R1 = 5100.f;
-	const float invBeta = 1.f / 3600.f;
-	static int32_t adc_contr_x100 = 0;
+	#if TEMPERATURE_SENSOR_USE_SENSOR == 0
+		const float R1 = 5100.f;
+		const float invBeta = 1.f / 3600.f;
+		static int32_t adc_contr_x100 = 0;
 
-	if (USE_TEMPERATURE_SENSOR & TEMPERATURE_SENSOR_CONTR)
-	{
 		if (adc_contr_x100 == 0)
 		{
 			adc_contr_x100 = adc_get_temperature_contr() * 100l;
@@ -264,7 +263,7 @@ int16_t temperature_contr_x100()
 			float R = R1 * ((102300.f / (102300.f - adc_contr_x100)) - 1.f);
 			return (int16_t)(thermistor_ntc_calculate_temperature(R, invBeta) * 100.f + 0.5f);
 		}
-	}
+	#endif
 
 	return 0;
 }
@@ -272,14 +271,12 @@ int16_t temperature_contr_x100()
 int16_t temperature_motor_x100()
 {
 	// Sensor only present in the BBSHD motor
-#if HAS_MOTOR_TEMP_SENSOR
-	const float R1 = 5100.f;
-	const float invBeta = 1.f / 3990.f;
+	#if TEMPERATURE_SENSOR_USE_SENSOR == 1
+		const float R1 = 5100.f;
+		const float invBeta = 1.f / 3990.f;
 
-	static int32_t adc_motor_x100 = 0;
+		static int32_t adc_motor_x100 = 0;
 
-	if (USE_TEMPERATURE_SENSOR & TEMPERATURE_SENSOR_MOTOR)
-	{
 		bool first = false;
 		if (adc_motor_x100 == 0)
 		{
@@ -319,8 +316,7 @@ int16_t temperature_motor_x100()
 				return(int16_t)(thermistor_ntc_calculate_temperature(R, invBeta) * 100.f + 0.5f);
 			}
 		}
-	}
-#endif
+	#endif
 
 	return 0;
 }

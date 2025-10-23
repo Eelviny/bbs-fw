@@ -25,12 +25,13 @@ def write_pas_levels(pas_levels: PedalAssistLevels, header_file: HeaderFile):
 def write_general(
     config: BaseModel, header_file: HeaderFile, prefix_category: str = ""
 ):
+    model_schema = config.model_json_schema()["properties"]
     for config_type, config_item in config:
         if isinstance(config_item, PedalAssistLevels):
             write_pas_levels(config_item, header_file)
         elif isinstance(config_item, BaseModel):
             write_general(config_item, header_file, f"{prefix_category}{config_type}_")
-        else:
+        elif not model_schema[config_type].get("excluded"):
             header_file.write_define(
                 prefix_category + config_type,
                 config_item,

@@ -6,15 +6,17 @@ from pint.registry import Quantity
 
 def convert_pint_units_config(item_key: str, item_quantity: Quantity):
     unit_suffixes = {
+        "ampere": "amps",
+        "centivolt": "cV",
+        "degree_Celsius": "c",
+        "inch": "inch",
         "kilometer / hour": "kph",
         "millimeter": "mm",
-        "ampere": "amps",
-        "volt": "v",
-        "second": "s",
         "millisecond": "ms",
-        "degree_Celsius": "c",
+        "second": "s",
+        "volt": "v",
     }
-    unit_suffix = unit_suffixes[str(item_quantity.units)]
+    unit_suffix = unit_suffixes.get(str(item_quantity.units))
     return f"{item_key}_{unit_suffix}", floor(item_quantity.magnitude)
 
 
@@ -29,11 +31,12 @@ class HeaderFile:
         self.file.write(f"{'  ' * indentation_level}{line}\n")
 
     def write_define(self, key: str, value):
-        if isinstance(value, bool):
-            value = int(value)
-        if isinstance(value, Quantity):
-            key, value = convert_pint_units_config(key, value)
-        self.write_line(f"#define {key.upper()} {value}", 1)
+        if value is not None:
+            if isinstance(value, bool):
+                value = int(value)
+            if isinstance(value, Quantity):
+                key, value = convert_pint_units_config(key, value)
+            self.write_line(f"#define {key.upper()} {value}", 1)
 
     def close_file(self):
         self.write_line("")

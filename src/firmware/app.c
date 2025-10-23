@@ -92,9 +92,9 @@ void app_init()
 	lights_disable();
 	lights_set(LIGHTS_MODE == LIGHTS_MODE_ALWAYS_ON);
 
-	lvc_voltage_x100 = LOW_CUT_OFF_V * 100u;
+	lvc_voltage_x100 = BATTERY_MINIMUM_VOLTAGE_V * 100u;
 
-	full_voltage_range_x100 = MAX_BATTERY_X100V - lvc_voltage_x100;
+	full_voltage_range_x100 = BATTERY_MAXIMUM_VOLTAGE_CV - lvc_voltage_x100;
 	low_voltage_pad_x100 = full_voltage_range_x100 * BATTERY_EMPTY_OFFSET_PERCENT / 100;
 	high_voltage_pad_x100 = full_voltage_range_x100 * BATTERY_FULL_OFFSET_PERCENT / 100;
 	padded_voltage_range_x100 = full_voltage_range_x100 - low_voltage_pad_x100 - high_voltage_pad_x100;
@@ -111,7 +111,7 @@ void app_init()
 	temperature_contr_c = 0;
 	temperature_motor_c = 0;
 
-	ramp_up_current_interval_ms = (MAX_CURRENT_AMPS * 10u) / CURRENT_RAMP_AMPS_S;
+	ramp_up_current_interval_ms = (MAX_CURRENT_AMPS * 10u) / CURRENT_RAMP_PER_SECOND_AMPS;
 	power_blocked_until_ms = 0;
 
 	pretension_cutoff_speed_rpm_x10 = convert_wheel_speed_kph_to_rpm(PRETENSION_SPEED_CUTOFF_KPH, false) * 10;
@@ -129,10 +129,10 @@ void app_init()
 	}
 	#endif
 
-	#if (LIGHTS_MODE == LIGHTS_MODE_DISABLED /*|| (motor_status() & MOTOR_ERROR_LVC) */)
-		lights_disable();
-	#else
+	#if LIGHTS_ENABLED
 		lights_enable();
+	#else
+		lights_disable();
 	#endif
 }
 
@@ -153,7 +153,7 @@ void app_process()
 		target_current = 0;
 		set_brake_lights(true);
 	}
-	else if (assist_level == ASSIST_PUSH && USE_PUSH_WALK)
+	else if (assist_level == ASSIST_PUSH && WALK_MODE_ENABLED)
 	{
 		target_current = calculate_current_for_power(WALK_MODE_TARGET_POWER_WATTS);
 	}
@@ -161,7 +161,7 @@ void app_process()
 	{
 		set_brake_lights(false);
 
-		#if USE_SPEED_SENSOR && USE_PRETENSION
+		#if SPEED_SENSOR_ENABLED && PRETENSION_ENABLED
 			apply_pretension(&target_current);
 		#endif
 		apply_pas_cadence(&target_current, throttle_percent);
@@ -182,7 +182,7 @@ void app_process()
 	bool thermal_limiting = apply_thermal_limit(&target_current);
 	bool lvc_limiting = apply_low_voltage_limit(&target_current);
 	bool shift_limiting =
-	#if USE_SHIFT_SENSOR
+	#if SHIFT_SENSOR_ENABLED
 		apply_shift_sensor_interrupt(&target_current);
 	#else
 		false;
@@ -191,7 +191,7 @@ void app_process()
 
 	apply_current_ramp_up(&target_current, is_limiting || !throttle_override);
 	apply_current_ramp_down(&target_current, !shift_limiting);
-	#if USE_SPEED_SENSOR
+	#if SPEED_SENSOR_ENABLED
 		apply_speed_limit(&target_current, throttle_override);
 	#endif
 
@@ -213,7 +213,7 @@ void app_set_assist_level(uint8_t level)
 {
 	if (assist_level != level)
 	{
-		if (assist_level == ASSIST_PUSH && USE_PUSH_WALK)
+		if (assist_level == ASSIST_PUSH && WALK_MODE_ENABLED)
 		{
 			// When releasing push walk mode pedals may have been rotating
 			// with the motor, block motor power for 2 seconds to prevent PAS
@@ -371,7 +371,7 @@ uint8_t app_get_temperature()
 	return (uint8_t)temp_max;
 }
 
-#if USE_SPEED_SENSOR && USE_PRETENSION
+#if SPEED_SENSOR_ENABLED && PRETENSION_ENABLED
 	void apply_pretension(uint8_t* target_current)
 	{
 		uint16_t current_speed_rpm_x10 = speed_sensor_get_rpm_x10();
@@ -513,7 +513,7 @@ uint8_t calculate_current_for_power(uint16_t watts)
 	return power_current_percent;
 }
 
-#if USE_SPEED_SENSOR
+#if SPEED_SENSOR_ENABLED
 	void apply_speed_limit(uint8_t* target_current, bool throttle_override)
 	{
 		static uint32_t last_pid_ms = 50;
@@ -606,7 +606,7 @@ bool apply_thermal_limit(uint8_t* target_current)
 	int16_t max_temp_x100 = MAX(temp_contr_x100, temp_motor_x100);
 	int8_t max_temp = MAX(temperature_contr_c, temperature_motor_c);
 
-	if (eventlog_is_enabled() && USE_TEMPERATURE_SENSOR && system_ms() >= next_log_temp_ms)
+	if (eventlog_is_enabled() && system_ms() >= next_log_temp_ms)
 	{
 		next_log_temp_ms = system_ms() + 10000;
 		eventlog_write_data(EVT_DATA_TEMPERATURE, (uint16_t)temperature_motor_c << 8 | temperature_contr_c);
@@ -711,7 +711,7 @@ bool apply_low_voltage_limit(uint8_t* target_current)
 	return false;
 }
 
-#if USE_SHIFT_SENSOR
+#if SHIFT_SENSOR_ENABLED
 	bool apply_shift_sensor_interrupt(uint8_t* target_current)
 	{
 		static uint32_t shift_sensor_act_ms = 0;
@@ -900,7 +900,7 @@ void reload_assist_params()
 	}
 	// only apply push walk params if push walk is active in config,
 	// otherwise data of previous assist level is kept.
-	else if (assist_level == ASSIST_PUSH && USE_PUSH_WALK)
+	else if (assist_level == ASSIST_PUSH && WALK_MODE_ENABLED)
 	{
 		assist_level_data.level.flags = 0;
 		assist_level_data.level.max_cadence_percent = 15;

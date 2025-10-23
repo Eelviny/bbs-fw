@@ -25,10 +25,6 @@
 #define ASSIST_MODE_SELECT_PAS9_LIGHT	0x0C
 #define ASSIST_MODE_SELECT_BRAKE_BOOT	0x0D
 
-
-#define TEMPERATURE_SENSOR_CONTR		0x01
-#define TEMPERATURE_SENSOR_MOTOR		0x02
-
 #define WALK_MODE_DATA_SPEED			0
 #define WALK_MODE_DATA_TEMPERATURE		1
 #define WALK_MODE_DATA_REQUESTED_POWER	2
@@ -39,10 +35,13 @@
 #define THROTTLE_GLOBAL_SPEED_LIMIT_STD_LVLS	2
 
 #define LIGHTS_MODE_DEFAULT						0
-#define LIGHTS_MODE_DISABLED					1
-#define LIGHTS_MODE_ALWAYS_ON					2
-#define LIGHTS_MODE_BRAKE_LIGHT					3
-#define LIGHTS_MODE_DEFAULT_AND_BRAKE_LIGHT		4 //When light is off, the light will be used as brake light, When its turned on it stays on
+#define LIGHTS_MODE_ALWAYS_ON					1
+#define LIGHTS_MODE_BRAKE_LIGHT					2
+#define LIGHTS_MODE_DEFAULT_AND_BRAKE_LIGHT		3 //When light is off, the light will be used as brake light, When its turned on it stays on
+
+#define MOTOR_TYPE_BBSHD		0
+#define MOTOR_TYPE_BBS02_750W	1
+#define MOTOR_TYPE_BBS02_500W	2
 
 #define CONFIG_VERSION					5
 #define PSTATE_VERSION					1

@@ -4,22 +4,37 @@
 # The type of Bafang motor. Allowed values: BBSHD, BBS02_750W, BBS02_500W
 motor_type: BBSHD
 
-# Global max current allowed. This can't be specified higher than the maximum safe current for the motor.
-max_current: 30A
+# Global max current allowed. This can't be higher than the maximum safe current for the specified motor type.
+# This is simply the maximum that the motor can pull safely, the actual power limit is set in watts per PAS level.
+# If not set, defaults to the maximum safe current, shown below:
+# - BBSHD: 	    30A
+# - BBS02_750W: 25A
+# - BBS02_500W: 20A
+# max_current: 25A
 
-# The global maximum speed allowed. Set to EU legal limits by default.
-# Note that the limit set on the display is ignored by the motor.
-global_max_speed: 25km/h
+# How many amps per second to increase by when accelerating. Higher number means faster acceleration to the target wattage.
+current_ramp_per_second: 8A
 
 # The circumference of each wheel in millimeters. Here's a chart to help you find yours, if you don't want to measure it:
 # https://www.crossroadscyclingco.com/articles/wheel-size-chart-for-bicycle-computer-settings-pg239.htm
 # This is used by the motor to calculate speed based on the speed sensor RPM, for applying speed limits.
 # Note that the wheel size set from the display is used by the display only, and is not shared with the motor.
 wheel_circumference: 2136mm
+# display_wheel_diameter: 28inch
+
+# Eggrider compatibility. When the display sets the speed limit
+# to a certain value, use sport mode. The actual speed limit of the motor
+# remains unchanged. This is a workaround; it is not possible to
+# program the controller using an Eggrider as bbsxtra does not have a
+# UART configuration interface. App configuration:
+# - Set "Bafang switch mode" to "Only live data"
+# - Make sure WHEEL_CIRCUMFERENCE_MM matches the Eggrider wheel circumference.
+# - Set "Max speed OffRoad" to the value set below.
+# speed_limit_sport_switch: 45km/h
 
 # The nominal and minimum voltage of the battery pack. The nominal voltage is used to calculate battery SOC.
 battery:
-  nominal_voltage: 48V
+  maximum_voltage: 58.8V
   minimum_voltage: 36V # Optional. Set this if the battery's BMS's low voltage cut off triggers before the motor does
   voltage_calibration_offset: 0V # Optional. Set this if the battery's voltage is not measured correctly
   # Padding values for voltage range of battery.
@@ -86,17 +101,41 @@ pedal_assist_levels:
   standard:
     levels:
       - flags: ASSIST_FLAG_NONE
-        max_cadence_percent: 100
+        max_cadence_percent: 0
         max_pas_speed: 0km/h
         target_power_watts: 0
         max_throttle_speed: 0km/h
         max_throttle_power_watts: 0
       - flags: ASSIST_FLAG_NONE
         max_cadence_percent: 100
-        max_pas_speed: 0km/h
-        target_power_watts: 0
-        max_throttle_speed: 0km/h
-        max_throttle_power_watts: 0
+        max_pas_speed: 18km/h
+        target_power_watts: 150
+        max_throttle_speed: 6km/h
+        max_throttle_power_watts: 1000
+      - flags: ASSIST_FLAG_NONE
+        max_cadence_percent: 100
+        max_pas_speed: 25km/h
+        target_power_watts: 250
+        max_throttle_speed: 6km/h
+        max_throttle_power_watts: 1000
+      - flags: ASSIST_FLAG_NONE
+        max_cadence_percent: 100
+        max_pas_speed: 25km/h
+        target_power_watts: 500
+        max_throttle_speed: 6km/h
+        max_throttle_power_watts: 1000
+      - flags: ASSIST_FLAG_NONE
+        max_cadence_percent: 100
+        max_pas_speed: 25km/h
+        target_power_watts: 750
+        max_throttle_speed: 6km/h
+        max_throttle_power_watts: 1000
+      - flags: ASSIST_FLAG_NONE
+        max_cadence_percent: 100
+        max_pas_speed: 25km/h
+        target_power_watts: 1000
+        max_throttle_speed: 6km/h
+        max_throttle_power_watts: 1000
   sport:
     levels:
       - flags: ASSIST_FLAG_NONE
@@ -105,3 +144,33 @@ pedal_assist_levels:
         target_power_watts: 0
         max_throttle_speed: 0km/h
         max_throttle_power_watts: 0
+      - flags: ASSIST_FLAG_NONE
+        max_cadence_percent: 100
+        max_pas_speed: 20km/h
+        target_power_watts: 250
+        max_throttle_speed: 45km/h
+        max_throttle_power_watts: 1200
+      - flags: ASSIST_FLAG_NONE
+        max_cadence_percent: 100
+        max_pas_speed: 25km/h
+        target_power_watts: 500
+        max_throttle_speed: 45km/h
+        max_throttle_power_watts: 1200
+      - flags: ASSIST_FLAG_NONE
+        max_cadence_percent: 100
+        max_pas_speed: 30km/h
+        target_power_watts: 750
+        max_throttle_speed: 45km/h
+        max_throttle_power_watts: 1200
+      - flags: ASSIST_FLAG_NONE
+        max_cadence_percent: 100
+        max_pas_speed: 35km/h
+        target_power_watts: 1000
+        max_throttle_speed: 45km/h
+        max_throttle_power_watts: 1200
+      - flags: ASSIST_FLAG_NONE
+        max_cadence_percent: 100
+        max_pas_speed: 45km/h
+        target_power_watts: 1200
+        max_throttle_speed: 45km/h
+        max_throttle_power_watts: 1200

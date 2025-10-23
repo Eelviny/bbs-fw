@@ -12,27 +12,24 @@
 
 // Will apply conversions to make the display show the right numbers when it's set to mph/farenheit.
 // Note that you must still use values in this config in use by countries that have yet to experience freedom.
-#define USE_FREEDOM_UNITS 0
+#define PREFER_IMPERIAL_UNITS 0
 
-#if defined(BBSHD)
- #define MAX_CURRENT_AMPS 30
-#elif defined(BBS02)
- #define MAX_CURRENT_AMPS 25
-#else
- #define MAX_CURRENT_AMPS 20
-#endif
+#define MOTOR_TYPE MOTOR_TYPE_BBS02_750W
+#define MAX_CURRENT_AMPS 30
 
-#define CURRENT_RAMP_AMPS_S 8
-#define MAX_BATTERY_X100V 5880
-#define LOW_CUT_OFF_V 42
 
-#define USE_SPEED_SENSOR 1
-#define USE_SHIFT_SENSOR 1
-#define USE_PUSH_WALK 1
-#define USE_PRETENSION 0
+#define CURRENT_RAMP_PER_SECOND_AMPS 8
+#define BATTERY_MAXIMUM_VOLTAGE_CV 5880
+#define BATTERY_MINIMUM_VOLTAGE_V 42
+
+#define SPEED_SENSOR_ENABLED 1
+#define SHIFT_SENSOR_ENABLED 1
+#define WALK_MODE_ENABLED 1
+#define PRETENSION_ENABLED 0
 #define PRETENSION_SPEED_CUTOFF_KPH 16
-#define USE_TEMPERATURE_SENSOR TEMPERATURE_SENSOR_CONTR
-#define LIGHTS_MODE LIGHTS_MODE_DEFAULT
+#define TEMPERATURE_SENSOR_USE_SENSOR 0
+#define LIGHTS_ENABLED 1
+#define LIGHTS_MODE 0
 
 #define WHEEL_CIRCUMFERENCE_MM 2268
 // #define DISPLAY_WHEEL_DIAMETER_INCH 28
